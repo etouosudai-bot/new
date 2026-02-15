@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My UV Proxy</title>
+    <script src="/uv/uv.bundle.js" defer></script>
+    <script src="/uv/uv.config.js" defer></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #1a1a1a; color: white; margin-top: 10vh; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        input { padding: 15px; width: 70%; border-radius: 25px; border: none; outline: none; font-size: 16px; }
+        button { padding: 15px 30px; border-radius: 25px; border: none; background: #7289da; color: white; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        button:hover { background: #5d6ea3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ultraviolet Proxy</h1>
+        <form id="uv-form">
+            <input id="uv-address" type="text" placeholder="URLか検索ワードを入力..." />
+            <button type="submit">Go</button>
+        </form>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const form = document.getElementById('uv-form');
+            const input = document.getElementById('uv-address');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                // Service Workerの登録（ここがuv.sw.jsなのが大事！）
+                await navigator.serviceWorker.register('/uv/uv.sw.js', {
+                    scope: __uv$config.prefix
+                });
+
+                let url = input.value.trim();
+                if (!url.startsWith('http') && !url.includes('.')) {
+                    url = 'https://www.google.com/search?q=' + url;
+                } else if (!url.startsWith('http')) {
+                    url = 'https://' + url;
+                }
+
+                location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            });
+        });
+    </script>
+</body>
+</html>
