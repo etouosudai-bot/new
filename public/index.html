@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>My UV Proxy</title>
+    <script src="/uv/uv.bundle.js" defer></script>
+    <script src="/uv/uv.config.js" defer></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin-top: 100px; }
+        input { padding: 15px; width: 300px; border-radius: 20px; border: none; }
+        button { padding: 15px 30px; border-radius: 20px; background: #7289da; color: white; cursor: pointer; border: none; }
+    </style>
+</head>
+<body>
+    <h1>Ultraviolet Proxy</h1>
+    <form id="uv-form">
+        <input id="uv-address" type="text" placeholder="URLを入力..." />
+        <button type="submit">Go</button>
+    </form>
+    <script>
+        window.addEventListener('load', () => {
+            const form = document.getElementById('uv-form');
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: __uv$config.prefix });
+                let url = document.getElementById('uv-address').value.trim();
+                if (!url.startsWith('http')) url = 'https://' + url;
+                location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            });
+        });
+    </script>
+</body>
+</html>
